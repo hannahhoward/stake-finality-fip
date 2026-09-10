@@ -15,22 +15,22 @@ requires: 86, 100, 105, 115
 > are chosen to make the design work; items marked *[needs precise spec]* are deliberately
 > left open.
 
-> **How to read this.** Four questions, in order.
->
-> 1. **Do I accept the premise?** The proposal takes as given that the storage base is declining and that the token has to hold through years of storage-economics work. If not, cheaper instruments exist and *Change Motivation* names them; say why and stop there.
-> 2. **Is a stake-weighted finality committee the right first step?** It secures finality only; leader election, block production and PoRep are untouched. If the first step should be something else, that is the feedback to give.
-> 3. **Does the mechanism hold?** A staking actor, a stake-derived power table, a reward paid only for signatures in canonical certificates at a rate that falls as stake arrives, correlation-scaled slashing, and an activation gate on depth and dispersion. Where would you tighten it, and which strawman constants would you set differently?
-> 4. **Is the price worth paying, whatever the source?** The pool needs about 100M FIL of income over the program's life. Where that comes from is left open here. Is slashable, stake-secured finality worth a bill of that size?
->
-> Supporting analyses are linked in the comments below.
+**How to read this.** Four questions, in order.
 
-**The reward this proposal pays needs a funded pool. Several ways to fund it exist and have been
+1. **Do I accept the premise?** The proposal takes as given that the storage base is declining and that the token has to hold through years of storage-economics work. If not, cheaper instruments exist and *Change Motivation* names them; say why and stop there.
+2. **Is a stake-weighted finality committee the right first step?** It secures finality only; leader election, block production and PoRep are untouched. If the first step should be something else, that is the feedback to give.
+3. **Does the mechanism hold?** A staking actor, a stake-derived power table, a reward paid only for signatures in canonical certificates at a rate that falls as stake arrives, correlation-scaled slashing, and an activation gate on depth and dispersion. Where would you tighten it, and which strawman constants would you set differently?
+4. **Is the price worth paying, whatever the source?** The pool needs about 100M FIL of income over the program's life. Where that comes from is left open here. Is slashable, stake-secured finality worth a bill of that size?
+
+Supporting analyses are linked in the comments below.
+
+*The reward this proposal pays needs a funded pool. Several ways to fund it exist and have been
 explored in depth, and we leave the source deliberately open here, to assess consensus on the
-mechanism and its rationale first. The companion analysis, *[Funding the finality reward: options
-and a recommendation](https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html)*, carries that exploration; it is not the subject of this
+mechanism and its rationale first. The companion analysis, **[Funding the finality reward: options
+and a recommendation](https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html)**, carries that exploration; it is not the subject of this
 thread. Should consensus emerge that we *want* to do this, we move to the thornier discussion of
 *how* to fund it. §5 states what the mechanism requires of any source, and the mechanism activates
-only with an accepted funding source adopted together with it.**
+only with an accepted funding source adopted together with it.*
 
 # FIP-XXXX: Stake-Weighted F3 Finality
 
