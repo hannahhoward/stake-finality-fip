@@ -1,6 +1,6 @@
 # Analysis of storage-only attacks under Expected Consensus, QAP Fast Finality, and Stake Finality
 
-*Supporting analysis for the draft FIP [Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX).*
+*Supporting analysis for the draft FIP [Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288).*
 
 With storage power alone (no staked FIL), an attacker faces different odds under the three regimes this document prices: Expected Consensus as the network runs today, F3 fast finality weighted by quality-adjusted power (QAP), and F3 weighted by staked FIL. The most damaging attack, a reorg that reverses hours of settled history and reaches exchange deposits, costs 20% of QAP today and 33% once F3 is weighted by QAP, and storage power alone cannot run it at all once F3 is weighted by stake. Two cheaper attacks survive in every regime: reorgs of one to a few epochs at 20% of QAP, which reach integrations that settle within a few epochs (Filecoin Pay among them) but no exchange; and full forward control, meaning censoring transactions, setting throughput, or taking all block rewards, at 51% of QAP. The price of each share falls over the program window, in cash and in the number of owners who must collude, and in FIL too unless QAP settles above about 2.8 EiB.
 

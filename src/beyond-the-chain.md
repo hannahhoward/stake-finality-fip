@@ -1,6 +1,6 @@
 # Beyond the chain: operationalizing stake-weighted finality
 
-*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* lays out the changes required to the chain actors and node clients: the power table for F3, the fast-finality protocol Filecoin's committee runs, is derived from staked FIL instead of quality-adjusted storage power. This document describes the additional off-chain tasks that will make stake-weighted finality a successful program. They all serve one goal, the activation threshold: about 80M FIL staked and dispersed, the level at which certificates become authoritative.
+*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* lays out the changes required to the chain actors and node clients: the power table for F3, the fast-finality protocol Filecoin's committee runs, is derived from staked FIL instead of quality-adjusted storage power. This document describes the additional off-chain tasks that will make stake-weighted finality a successful program. They all serve one goal, the activation threshold: about 80M FIL staked and dispersed, the level at which certificates become authoritative.
 
 ## What the protocol ships
 
@@ -110,4 +110,4 @@ Block-producer software has to submit certificates, and storage-provider F3 part
 
 ---
 
-Further reading: [the FIP discussion](https://github.com/filecoin-project/FIPs/discussions/XXXX), [funding the finality reward: options and a recommendation](https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html), [how the finality reward is paid for](https://hannahhoward.github.io/stake-finality-fip/funding-explainer.html), [storage-only attacks](https://hannahhoward.github.io/stake-finality-fip/storage-only-attacks.html), [two classes of stake](https://hannahhoward.github.io/stake-finality-fip/two-class-stake.html), [all supporting documents](https://hannahhoward.github.io/stake-finality-fip).
+Further reading: [the FIP discussion](https://github.com/filecoin-project/FIPs/discussions/1288), [funding the finality reward: options and a recommendation](https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html), [how the finality reward is paid for](https://hannahhoward.github.io/stake-finality-fip/funding-explainer.html), [storage-only attacks](https://hannahhoward.github.io/stake-finality-fip/storage-only-attacks.html), [two classes of stake](https://hannahhoward.github.io/stake-finality-fip/two-class-stake.html), [all supporting documents](https://hannahhoward.github.io/stake-finality-fip).

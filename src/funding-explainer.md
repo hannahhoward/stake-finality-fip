@@ -1,6 +1,6 @@
 # How the finality reward is paid for
 
-A companion to the draft FIP *[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)*, which specifies the
+A companion to the draft FIP *[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)*, which specifies the
 mechanism (the staking actor, the stake-weighted committee, certificate-gated rewards, slashing,
 and the activation gate), and to the funding analysis *[Funding the finality reward: options and
 a recommendation](https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html)*. The FIP leaves the funding source open; the analysis

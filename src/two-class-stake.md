@@ -1,6 +1,6 @@
 # Two classes of stake: an idea for exploration
 
-*An idea being explored alongside the draft FIP [Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX). It is not part of that proposal, and nothing in the draft depends on it. It changes what the staking actor would have to hold.*
+*An idea being explored alongside the draft FIP [Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288). It is not part of that proposal, and nothing in the draft depends on it. It changes what the staking actor would have to hold.*
 
 ## Summary
 
@@ -70,4 +70,4 @@ The at-will rate stays on the schedule.
 
 The locked-share cap is the one constant still unpriced. The figures in the draft and in the [funding analysis](https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html) are all computed on at-will stake. The pledge levels and the cost of acquiring storage power used here are set out in the [storage-side analysis](https://hannahhoward.github.io/stake-finality-fip/storage-only-attacks.html).
 
-Comments belong on the [draft FIP](https://github.com/filecoin-project/FIPs/discussions/XXXX).
+Comments belong on the [draft FIP](https://github.com/filecoin-project/FIPs/discussions/1288).

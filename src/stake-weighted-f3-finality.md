@@ -2,7 +2,7 @@
 fip: "XXXX"
 title: Stake-Weighted F3 Finality
 author: Hannah Howard (@hannahhoward)
-discussions-to: https://github.com/filecoin-project/FIPs/discussions/XXXX
+discussions-to: https://github.com/filecoin-project/FIPs/discussions/1288
 status: Draft
 type: Technical
 category: Core

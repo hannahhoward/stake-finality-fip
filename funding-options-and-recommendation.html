@@ -7,14 +7,14 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="nav"><a href="index.html">Stake-Weighted F3 Finality</a><span class="sep">·</span><a href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Discussion on the FIPs repo</a></div>
+<div class="nav"><a href="index.html">Stake-Weighted F3 Finality</a><span class="sep">·</span><a href="https://github.com/filecoin-project/FIPs/discussions/1288">Discussion on the FIPs repo</a></div>
 <main>
 
 <h1
 id="funding-the-finality-reward-options-and-a-recommendation">Funding
 the finality reward: options and a recommendation</h1>
 <p><em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> pays staked FIL a reward for signing finality
 certificates, and it leaves open where that money comes from. §5 of
 <em>Stake-Weighted F3 Finality</em> states the requirement and the four
@@ -52,7 +52,7 @@ FIL</h2>
 <p><strong>The pool needs roughly 100M FIL of income over the program’s
 life</strong>, 90M to 97M across the option set below. Holding 80M FIL
 staked, the security level the activation gate reads (<em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> §6, and the level at which a third of the pool is a
 meaningful forfeit), for twelve years costs roughly that at the 3–5%
 return holders of comparable assets accept today. Less money buys a
@@ -84,7 +84,7 @@ tenth of Filecoin’s circulating supply, is asking for less participation
 than is routine elsewhere.</p>
 <p>The posted rate opens under a 12% ceiling and settles at 4.0–5.0%
 while staked FIL holds the security level (<em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> §3), inside that band at both ends. Nothing in the
 design fixes the rate; the market sets it, and the model treats 5% as
 the central case with 5.5% and 6% as the stress rows.</p>
@@ -106,7 +106,7 @@ actor with no controller, keeping an <strong>unreleased</strong> and a
 <strong>released</strong> ledger. Only the released ledger would be
 spendable, and only the released ledger is what the posted rate reads
 (<em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> §3).</p>
 <p><strong>A fixed release table.</strong> Part of the transfer would be
 released at the upgrade epoch and the rest by a fixed annual table,
@@ -166,7 +166,7 @@ mis-stated figure moves per-sector pledge.</p>
 <p><strong>Two reviews and a sunset.</strong> A <strong>year-3
 non-activation review</strong>, triggered if the activation conditions
 (<em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> §6) have never been met, and annually thereafter
 until they are. The failure it catches is a pool that recruits stake,
 pays for advisory certificates, and never reaches the level at which any
@@ -372,7 +372,7 @@ worth about one more year at or above the security level.</p>
 <h3 id="the-worked-scenario">The worked scenario</h3>
 <p>One configuration produces every illustration here and the rate table
 and curve in <em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> §3: a 49.789M FIL transfer with 30M released at the
 upgrade epoch, a 25% service cap, a 35% storage-provider floor, and the
 constants <code>spend_rate = 0.22</code> and
@@ -497,7 +497,7 @@ rate never rises with pool depth.</p>
 <td>Two anchors fix <code>spend_rate</code> and <code>S_offset</code>
 once the released pool at launch is chosen, and both bind in every
 option: the 12% ceiling on the launch rate (<em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> §3), and the rate the schedule posts while staked
 FIL sits at or above the 80M FIL security level, 4.0–5.0% throughout
 that run at a 5% required return, checked month by month, inside the
@@ -514,7 +514,7 @@ and nothing ever if that year never arrives</td>
 no stream income the pool cannot post a deep enough rate to fill early,
 and staked FIL does not reach the 80M FIL security level until around
 year 8 — six more years on the weaker fallback tolerance <em><a
-href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+href="https://github.com/filecoin-project/FIPs/discussions/1288">Stake-Weighted
 F3 Finality</a></em> prices</td>
 </tr>
 <tr>

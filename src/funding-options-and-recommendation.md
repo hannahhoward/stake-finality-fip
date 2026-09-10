@@ -1,6 +1,6 @@
 # Funding the finality reward: options and a recommendation
 
-*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* pays staked FIL a reward for signing finality
+*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* pays staked FIL a reward for signing finality
 certificates, and it leaves open where that money comes from. §5 of *Stake-Weighted F3 Finality*
 states the requirement and the four things the mechanism reads from whatever supplies it.
 
@@ -34,7 +34,7 @@ behind the figures are unpublished and available on request.
 
 **The pool needs roughly 100M FIL of income over the program's life**, 90M to 97M across the
 option set below. Holding 80M FIL staked, the security level the activation gate reads
-(*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* §6, and the level at which a third of the pool is a
+(*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* §6, and the level at which a third of the pool is a
 meaningful forfeit), for twelve years costs roughly that at the 3–5% return holders of comparable
 assets accept today. Less money buys a shallower pool held for fewer years. The figure is a
 strawman calibrated to those comparables *[re-check: the comparable rates and the required return
@@ -58,7 +58,7 @@ across a comparable set runs 23–69% with a median near 45%, so a design recrui
 tenth of Filecoin's circulating supply, is asking for less participation than is routine elsewhere.
 
 The posted rate opens under a 12% ceiling and settles at 4.0–5.0% while staked FIL holds the
-security level (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* §3), inside that band at both ends.
+security level (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* §3), inside that band at both ends.
 Nothing in the design fixes the rate; the market sets it, and the model treats 5% as the central
 case with 5.5% and 6% as the stress rows.
 
@@ -77,7 +77,7 @@ depends on the row adopted.
 
 **A reward-pool actor with two ledgers.** A built-in actor with no controller, keeping an
 **unreleased** and a **released** ledger. Only the released ledger would be spendable, and only the
-released ledger is what the posted rate reads (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* §3).
+released ledger is what the posted rate reads (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* §3).
 
 **A fixed release table.** Part of the transfer would be released at the upgrade epoch and the rest
 by a fixed annual table, shaped like the year-over-year decline of the scheduled simple-minting
@@ -124,7 +124,7 @@ circulating on the day it moves, which is a consensus-visible error: `FilCircula
 initial-pledge lock target, so a mis-stated figure moves per-sector pledge.
 
 **Two reviews and a sunset.** A **year-3 non-activation review**, triggered if the activation
-conditions (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* §6) have never been met, and annually
+conditions (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* §6) have never been met, and annually
 thereafter until they are. The failure it catches is a pool that recruits stake, pays for advisory
 certificates, and never reaches the level at which any of them binds. Year 3 rather than year 2:
 the pool crosses the threshold in year 2 at a 5% required return but not until years 3 to 6 in the
@@ -197,7 +197,7 @@ at or above the security level.
 ### The worked scenario
 
 One configuration produces every illustration here and the rate table and curve in
-*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* §3: a 49.789M FIL transfer with 30M released at the
+*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* §3: a 49.789M FIL transfer with 30M released at the
 upgrade epoch, a 25% service cap, a 35% storage-provider floor, and the constants `spend_rate =
 0.22` and `S_offset = 55M`. It holds 80M FIL staked for 13 contiguous years at a 5% required
 return, pays 83.6M FIL to stakers over 30 years (against 76M to 79M on the option rows), and runs
@@ -291,8 +291,8 @@ reserve the pool never accumulates a balance, so the posted rate never rises wit
 
 | Alternative | Why not |
 |---|---|
-| **A different pair of launch constants** | Two anchors fix `spend_rate` and `S_offset` once the released pool at launch is chosen, and both bind in every option: the 12% ceiling on the launch rate (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* §3), and the rate the schedule posts while staked FIL sits at or above the 80M FIL security level, 4.0–5.0% throughout that run at a 5% required return, checked month by month, inside the cross-chain band §1 above reports. In the worked configuration the pair puts the launch rate at exactly 12.00%, and a rate sitting exactly on the ceiling does not survive publication rounding, so the adopted pair leaves headroom below it |
-| **A gated later draw alone** — draw nothing from the reserve until the network has run a year below a set issuance threshold, and nothing ever if that year never arrives | The least contested design available, and it costs six years: with no stream income the pool cannot post a deep enough rate to fill early, and staked FIL does not reach the 80M FIL security level until around year 8 — six more years on the weaker fallback tolerance *[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/XXXX)* prices |
+| **A different pair of launch constants** | Two anchors fix `spend_rate` and `S_offset` once the released pool at launch is chosen, and both bind in every option: the 12% ceiling on the launch rate (*[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* §3), and the rate the schedule posts while staked FIL sits at or above the 80M FIL security level, 4.0–5.0% throughout that run at a 5% required return, checked month by month, inside the cross-chain band §1 above reports. In the worked configuration the pair puts the launch rate at exactly 12.00%, and a rate sitting exactly on the ceiling does not survive publication rounding, so the adopted pair leaves headroom below it |
+| **A gated later draw alone** — draw nothing from the reserve until the network has run a year below a set issuance threshold, and nothing ever if that year never arrives | The least contested design available, and it costs six years: with no stream income the pool cannot post a deep enough rate to fill early, and staked FIL does not reach the 80M FIL security level until around year 8 — six more years on the weaker fallback tolerance *[Stake-Weighted F3 Finality](https://github.com/filecoin-project/FIPs/discussions/1288)* prices |
 | **A bootstrap premium** — a separate tranche adding 3 percentage points to the offered rate for the first 36 months | The release schedule already pays early stake more than late stake: the rate opens in double digits while stake is shallow and falls to around 5% by the time 80M FIL is staked. The launch rate also leaves no room, since the constants sit against the 12% ceiling in every option, so a 3-point adder would open at 15% |
 | **A smaller baseline cap** — reduce the 770M baseline cap and pay the pool from the difference | It cuts storage-provider reward from the first epoch, before the committee exists and before a single certificate is signed: baseline emission is proportional to the cap, so the baseline slice falls in proportion to the carve *[re-check: today's baseline slice runs ~3.1M FIL/yr]* |
 | **A deeper cut to the block-reward split instead of a new fund** | Each cut lowers storage-provider revenue against fee obligations that do not fall with it, which makes terminating sectors to recover pledge the rational response, and that removes quality-adjusted power. The loop is not modeled here, and the modeling is owed before any deeper cut is proposed |
