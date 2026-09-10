@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the finality reward is paid for</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="nav"><a href="index.html">Stake-Weighted F3 Finality</a><span class="sep">·</span><a href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Discussion on the FIPs repo</a></div>
+<main>
+
+<h1 id="how-the-finality-reward-is-paid-for">How the finality reward is
+paid for</h1>
+<p>A companion to the draft FIP <em><a
+href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+F3 Finality</a></em>, which specifies the mechanism (the staking actor,
+the stake-weighted committee, certificate-gated rewards, slashing, and
+the activation gate), and to the funding analysis <em><a
+href="https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html">Funding
+the finality reward: options and a recommendation</a></em>. The FIP
+leaves the funding source open; the analysis explores the options and
+recommends one. This covers one question: where the FIL that pays
+finality signers comes from, and what each option costs the people
+already being paid.</p>
+<p>Constants marked <em>[strawman]</em> are chosen to make the design
+work; items marked <em>[needs precise spec]</em> are unresolved.</p>
+<h2 id="what-changes">1. What changes</h2>
+<p>Finality signers are paid a posted rate on their staked FIL. Paying
+them takes about 100M FIL of income to a reward pool over thirty years,
+90M to 97M across the options in section 2. Two sources could supply it,
+neither of them new minting.</p>
+<p>One is required: a one-time transfer from the mining reserve, capped
+at an envelope the design commits to, which reaches the reward pool on a
+fixed schedule and enters circulation only as stakers are actually paid.
+The transfer can carry the whole program on its own, and that is what
+the analysis recommends.</p>
+<p>The other is optional: a finality stream inside the Solstice
+block-reward split, opened to shrink the transfer. It is paid out of
+block reward that FIP-0118 (Solstice) as passed would pay to service and
+to storage providers. The service entitlement is Solstice’s share of
+block reward for network services other than storage-provider consensus;
+opening the stream caps it below its published 50%, and continues the
+storage-provider consensus share below Solstice’s 50% floor at half the
+pace of the ramp Solstice already publishes. What those two amendments
+leave unclaimed, the residue under the two shares, is what the stream is
+paid.</p>
+<p><strong>How much comes from each source is open.</strong> The two
+trade against each other almost exactly: opening the stream deeper means
+a smaller draw on the reserve, and leaving FIP-0118 untouched means a
+larger one. The preferred option is the 91M FIL envelope with FIP-0118
+as passed; the deepest rebalance brings it down to 48M FIL. Section 2
+gives the reasons.</p>
+<p>Simple minting, baseline minting, the baseline target, and the 2B
+total-supply cap are untouched under every option. So is falling
+issuance: FIL entering circulation is lower every year than the year
+before, in every option and at both modeled required returns. The float
+still grows each year, by less each time.</p>
+<h2 id="where-the-money-comes-from">2. Where the money comes from</h2>
+<p>Nothing is minted. The pool needs roughly 100M FIL of income over the
+program’s life, 90M to 97M across the options below, which is what
+holding 80M FIL staked for twelve years costs at the 3–5% return holders
+of comparable assets accept today. Two sources could supply it. The
+required one is a one-time transfer from the mining reserve. The
+optional one is a finality stream inside the Solstice split, opened by
+amending FIP-0118, which shrinks the transfer.</p>
+<p>The transfer is required because a stream on its own cannot work at
+any curve: the stream is a flow that peaks near 4M FIL a year and then
+decays, while holding 80M FIL at a 5% required return costs 4M FIL a
+year indefinitely. The stream also pays little in the first years after
+the upgrade, which are the years the offer has to recruit stake, so the
+transfer carries them under every option.</p>
+<p><strong>The analysis recommends the reserve on its own.</strong> The
+reserve was set aside at genesis for new miner types and has never been
+spent, and finality signers are a new type doing new work. Paying
+signers out of the reserve leaves the block reward alone. Storage
+providers are already partway through Solstice’s ramp from 95% down to
+50%, and cutting deeper is the direction that pushes marginal sectors to
+terminate, which removes the storage power the network’s security rests
+on. A reward that takes nothing from anyone’s share also leaves storage
+providers and stakers with no contest over the split.</p>
+<p>That costs money. The reserve on its own is the biggest draw, and the
+most the network spends on consensus in total. It runs +38.8M FIL above
+today’s committed curve over the first decade, where the cheapest
+rebalance runs +10.9M. The rebalance options stay on the table for that
+reason, and which mix is adopted is a governance decision.</p>
+<p>Every option below meets the requirement. They differ in how much
+reserve FIL is committed and in how much FIL enters circulation over the
+first decade above today’s committed curve, and the two move
+together.</p>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Service cap</th>
+<th>Storage-provider floor</th>
+<th>Reserve envelope</th>
+<th>First decade above today’s committed curve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>35%</td>
+<td>25%</td>
+<td>48M FIL</td>
+<td>+10.9M FIL</td>
+</tr>
+<tr>
+<td>35%</td>
+<td>30%</td>
+<td>55M FIL</td>
+<td>+13.5M FIL</td>
+</tr>
+<tr>
+<td>40%</td>
+<td>25%</td>
+<td>53M FIL</td>
+<td>+15.5M FIL</td>
+</tr>
+<tr>
+<td>40%</td>
+<td>35%</td>
+<td>67M FIL</td>
+<td>+21.1M FIL</td>
+</tr>
+<tr>
+<td><strong>50%, unchanged — preferred</strong></td>
+<td><strong>50%, unchanged</strong></td>
+<td><strong>91M FIL</strong></td>
+<td><strong>+38.8M FIL</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Each row holds 80M FIL staked for twelve consecutive years from year
+2 at a 5% required return. For any row, a smaller envelope works at a
+higher first-decade cost: the smallest that still clears the bar is 42M
+FIL at a 35% cap with a 25% floor, then 48M at 35/30, 47.5M at 40/25,
+58M at 40/35, and 85M for the last row. Every FIL the stream delivers in
+the first decade is a FIL the reserve does not have to release, so the
+first-decade column falls one for one with what the stream brings in.
+The envelope column moves further, 48M to 91M against +10.9M to +38.8M,
+because part of every envelope sits in the pool rather than entering
+circulation in the first decade.</p>
+<p>The floor is never set above the cap. The analysis does not offer a
+package whose storage-provider floor exceeds the service cap, since it
+would guarantee the storage side more than the service side may
+take.</p>
+<p>The last row has no stream at all. At FIP-0118’s published 50% cap
+the residue never grows enough to recruit stake, so there is nothing
+worth paying a stream and the transfer carries the whole bill: 91M FIL,
+about a third of the reserve.</p>
+<p><strong>One rebalance scenario is worked through end to end</strong>
+in the numbers that follow, a 25% service cap with a 35%
+storage-provider floor: a 49.789M FIL transfer and the rate constants
+0.22 / 55M. That pairing is not one of the options above, because it
+puts the storage-provider floor above the service cap, and that split is
+also what puts its first-decade figure below every proposable option’s
+but the cheapest. The preferred row looks different: a larger transfer
+and no stream, at the figures the funding analysis carries. It
+illustrates the mechanics: how the posted rate moves with depth and with
+the pool, what the release schedule does to the opening rate, and what
+the quarter-by-quarter path looks like on the storage-provider side.
+Unless a figure says otherwise, sections 3 to 5 are that scenario.</p>
+<p>The <strong>required return</strong> is the yield below which a
+holder leaves their FIL unstaked; this document models 5% as the central
+case and 3% as the favorable one, and nothing in the design fixes it —
+the market does. The <strong>80M FIL security level</strong> is the pool
+depth at which a one-third coalition must put about 27M FIL of slashable
+capital at risk, which is the security level the mechanism FIP’s
+activation gate uses.</p>
+<p>At a 5% required return the pool pays stakers <strong>83.593M FIL
+over thirty years</strong>. At 3% it pays 87.728M. The largest single
+year is 4.890M FIL, in year 6, and payments decline after that.</p>
+<p><strong>The reserve ledger, in the worked scenario.</strong> The
+shape is the same under every option; the figures move with the
+envelope.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Line</th>
+<th>M FIL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reserve envelope, the cap the worked scenario commits to</td>
+<td>50.000</td>
+</tr>
+<tr>
+<td>Set aside for stream income that comes from baseline minting</td>
+<td>0.211</td>
+</tr>
+<tr>
+<td><strong>One-time transfer at the upgrade epoch</strong></td>
+<td><strong>49.789</strong></td>
+</tr>
+<tr>
+<td>Spendable in the pool at launch</td>
+<td>30.000</td>
+</tr>
+<tr>
+<td>Released by the annual table, years 1–30</td>
+<td>18.439</td>
+</tr>
+<tr>
+<td><strong>Total released over thirty years</strong></td>
+<td><strong>48.439</strong></td>
+</tr>
+<tr>
+<td>Never released, burns at the year-30 sunset</td>
+<td>1.350</td>
+</tr>
+<tr>
+<td>Pool balance left at year 30, burns at the sunset</td>
+<td>13.012</td>
+</tr>
+<tr>
+<td><strong>Total burned at the sunset</strong></td>
+<td><strong>14.362</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>A small share of the stream’s income comes from baseline minting
+rather than simple minting. The design counts everything that is not
+simple minting against the same envelope limit, so 0.211M is set aside
+for it here and the transfer is 49.789M rather than a round 50M.</p>
+<p>For context, the mining reserve holds 282.93M FIL. Across the option
+set the envelope is 17% to 32% of it.</p>
+<p>The transfer and the annual releases move FIL between two balances
+that both sit outside circulating supply, so neither steps circulating
+supply on the day it happens. Circulating supply rises only as the pool
+pays a staker, which requires the reserve-disbursement amendment the
+funding analysis recommends.</p>
+<p>Against Solstice as passed, which is a different baseline from
+today’s committed curve, the worked scenario puts 33.56M FIL more into
+circulation over the first decade and 67.39M more over thirty years.
+Against the same 35% floor and 25% cap with no pool at all, the
+difference is exactly the payments to stakers: 43.15M over the first
+decade and 83.59M over thirty years.</p>
+<p><strong>What the numbers assume.</strong> They come from a model with
+no price, no restaking or compounding, no delegation, and no
+distribution over required returns. Each required-return figure is one
+case run end to end. Capital arrives at a fixed 5M FIL per month up to a
+130M FIL ceiling, in 5M FIL steps, so a single-step difference between
+two nearby configurations is noise. Unless a figure says otherwise it is
+the 5% required-return case, with the 3% case shown alongside. Two
+conventions carry through the charts in section 4: the pool is one
+balance, so any split of payments between the reserve and the stream is
+an attribution by cumulative inflow rather than a traced flow; and
+per-EiB figures hold raw byte power flat at 1.398 EiB, which is what
+makes the steady-state ratios exact.</p>
+<h2 id="the-timeline">3. The timeline</h2>
+<p>Dates below assume Solstice activates on 2026-12-01 and finality
+launches one quarter later. Everything is anchored to activation, so if
+activation moves, every date moves with it. The storage-provider floor
+shown is the worked scenario’s 35%; a deeper floor takes two more
+quarters at 30% and four more at 25%, and under the reserve-only option
+the continuation never starts.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Milestone</th>
+<th>Quarters from activation</th>
+<th>Date</th>
+<th>Storage-provider share</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Activation</td>
+<td>0</td>
+<td>2026-12-01</td>
+<td>95%</td>
+</tr>
+<tr>
+<td>Finality launch</td>
+<td>1</td>
+<td>2027-03-01</td>
+<td>90%</td>
+</tr>
+<tr>
+<td>End of Solstice’s published ramp</td>
+<td>9</td>
+<td><strong>2029-03-01</strong></td>
+<td><strong>50%</strong></td>
+</tr>
+<tr>
+<td>Continuation begins, at 2.5pp per quarter</td>
+<td>9</td>
+<td>2029-03-01</td>
+<td>50%</td>
+</tr>
+<tr>
+<td><strong>Final floor</strong></td>
+<td><strong>15</strong></td>
+<td><strong>2030-09-01</strong></td>
+<td><strong>35%</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Solstice’s published ramp moves the storage-provider share 45
+percentage points over nine quarters, 5 points a quarter. The
+continuation moves the remaining 15 points at 2.5 points a quarter, half
+that pace, and takes six more quarters. There are two floor dates
+because there are two floors: the published 50% floor lands 2029-03-01,
+two years after finality launches, and the 35% floor lands 2030-09-01,
+three and a half years after launch.</p>
+<p>Where the stream is opened, the service share is computed as if it
+were absent and is never reduced by it. The stream takes only what is
+left. At a 35% floor the residue never exceeds 40% of block reward, so
+the stream is limited by the room available from the first quarter, and
+no block reward goes unallocated in any of the thirty years.</p>
+<p><strong>Stake reaches the 80M FIL security level at the end of year 2
+after launch</strong> under every funding option, and stays at or above
+it for at least twelve consecutive years at a 5% required return. In the
+worked scenario the run is thirteen years, through year 14; at a 3%
+required return it is eighteen. The thirteen-year figure is checked
+month by month, not only at year ends: inside the window stake never
+dips below 80.0M FIL and the posted rate never leaves 4.001–4.997%. The
+mechanism FIP’s activation threshold, which decides when finality
+certificates start deciding which chain is final rather than only
+advising, is proposed at this level; its final value is open.</p>
+<h2 id="what-the-model-shows">4. What the model shows</h2>
+<p>Every chart in this section is the worked scenario: a 49.789M FIL
+transfer, a 25% service cap and a 35% storage-provider floor. The shapes
+carry across the rebalance options; the levels move with the envelope.
+Under the recommended option there is no stream and no continuation
+below 50%, so the two block-reward charts have no counterpart there.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/issuance-yoy.png"
+alt="Annual issuance under this design against today’s committed curve" />
+<figcaption aria-hidden="true">Annual issuance under this design against
+today’s committed curve</figcaption>
+</figure>
+<p>FIL entering circulation falls every year, under every option. In
+this scenario it never runs more than 2.23M FIL above today’s committed
+curve, cumulatively +12.61M FIL over the first decade and +35.43M over
+thirty years. Across the option set those cumulative figures run +10.9M
+to +38.8M for the first decade and +32.3M to +76.6M for the thirty
+years. The worked scenario sits below all but the cheapest of them
+because its storage-provider floor is above its service cap.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/weights.png"
+alt="Block-reward shares by quarter from activation" />
+<figcaption aria-hidden="true">Block-reward shares by quarter from
+activation</figcaption>
+</figure>
+<p>The storage-provider share steps down to 50% in March 2029 and to its
+35% floor in September 2030, and the finality stream takes only the
+residue the other two shares leave.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/curve-depth.png"
+alt="Posted rate against total staked FIL, at four pool levels" />
+<figcaption aria-hidden="true">Posted rate against total staked FIL, at
+four pool levels</figcaption>
+</figure>
+<p>The posted rate falls as stake arrives, so the first 80M FIL of
+security is bought at a declining price rather than at one fixed
+rate.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/stake-apr-time.png"
+alt="Staked FIL and posted rate, years 1 to 30" />
+<figcaption aria-hidden="true">Staked FIL and posted rate, years 1 to
+30</figcaption>
+</figure>
+<p>Stake clears 80M FIL in year 2 and holds it for thirteen years while
+the posted rate settles into a 4.0–5.0% band.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/funding-stack.png"
+alt="Annual payments to stakers, split by funding source" />
+<figcaption aria-hidden="true">Annual payments to stakers, split by
+funding source</figcaption>
+</figure>
+<p>The reserve carries the first two years; the block-reward stream
+carries the rest and overtakes it in year 3.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/per-eib.png"
+alt="Consensus revenue per EiB under three schedules" />
+<figcaption aria-hidden="true">Consensus revenue per EiB under three
+schedules</figcaption>
+</figure>
+<p>Per-EiB consensus revenue settles at 70% of Solstice’s level and 35%
+of the no-split level at a 35% floor. At a 30% floor it is 60% of
+Solstice’s, at 25% it is 50%, and under the reserve-only option it is
+unchanged from Solstice.</p>
+<figure>
+<img
+src="https://hannahhoward.github.io/stake-finality-fip/charts/handoff.png"
+alt="Slashable stake against annual consensus reward" />
+<figcaption aria-hidden="true">Slashable stake against annual consensus
+reward</figcaption>
+</figure>
+<p>Slashable stake exceeds a full year of storage-provider consensus
+reward from year 1, 20.0M FIL against 15.2M, and the gap widens every
+year after.</p>
+<h2 id="what-a-staker-and-a-storage-provider-see">5. What a staker and a
+storage provider see</h2>
+<p>Both run the worked scenario from section 2.</p>
+<h3 id="a-staker">A staker</h3>
+<p>You stake 10,000 FIL in month 10 after finality launches, when 50M
+FIL is staked network-wide. The pool holds close to its 30M FIL launch
+balance, and the posted rate at that depth is <strong>6.29%</strong>.
+Held still for a year, that is about <strong>629 FIL</strong>, gross of
+the includer share paid to whoever submits the certificate and of the
+gas you pay to claim.</p>
+<p>The rate does not hold still, and it is the same rate for everyone.
+Two things move it. More stake lowers it: at the launch pool, 80M FIL
+staked posts 4.89% and 100M posts 4.26%. A fuller pool raises it: by
+year 6 the pool has grown to 34.15M FIL, where 80M staked posts 5.57%.
+In the 5% case the two effects settle against each other, and from year
+2 through year 14 the posted rate stays inside 4.0–5.0%. Staking early
+does not lock in a rate, and waiting does not improve one. The opening
+rate sits exactly on its 12% ceiling with no headroom above it.</p>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th>Total staked</th>
+<th>0</th>
+<th>25M</th>
+<th>50M</th>
+<th>80M</th>
+<th>100M</th>
+<th>130M</th>
+<th>200M</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Posted rate at launch, pool 30M FIL</td>
+<td>12.00%</td>
+<td>8.25%</td>
+<td>6.29%</td>
+<td>4.89%</td>
+<td>4.26%</td>
+<td>3.57%</td>
+<td>2.59%</td>
+</tr>
+<tr>
+<td>Posted rate in year 6, pool 34.15M FIL</td>
+<td>13.66%</td>
+<td>9.39%</td>
+<td>7.16%</td>
+<td>5.57%</td>
+<td>4.85%</td>
+<td>4.06%</td>
+<td>2.95%</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="a-storage-provider">A storage provider</h3>
+<p>Consensus revenue per EiB, on a flat 1.398 EiB basis and the section
+3 timeline (finality launch 2027-03-01). Years 1 and 2 are identical to
+Solstice because the published ramp is untouched and the continuation
+has not started.</p>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Year</th>
+<th>Under this design, 35% floor</th>
+<th>Solstice as passed, 50% floor</th>
+<th>No split at all</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>10.881</td>
+<td>10.881</td>
+<td>13.393</td>
+</tr>
+<tr>
+<td>2</td>
+<td>6.823</td>
+<td>6.823</td>
+<td>11.165</td>
+</tr>
+<tr>
+<td>3</td>
+<td>4.458</td>
+<td>4.894</td>
+<td>9.787</td>
+</tr>
+<tr>
+<td>5</td>
+<td>2.692</td>
+<td>3.846</td>
+<td>7.693</td>
+</tr>
+<tr>
+<td>10</td>
+<td>1.500</td>
+<td>2.142</td>
+<td>4.285</td>
+</tr>
+</tbody>
+</table></div>
+<p>Units are M FIL per EiB per year. In steady state the ratios are
+exact: 35% of the no-split level and 70% of Solstice’s. Over thirty
+years storage providers receive 67.991M FIL of consensus reward, against
+84.197M under Solstice as passed. A 30% or 25% floor takes the
+steady-state ratio to 60% or 50% of Solstice’s and costs storage
+providers more over the thirty years; the reserve-only option costs them
+nothing.</p>
+<p>The quarterly steps are smaller than the ones already published. The
+sharpest quarterly drop in per-EiB consensus revenue anywhere in the
+combined schedule is <strong>12.44%</strong>, and that is a step the
+published ramp already takes. The continuation below 50% moves 2.5
+points a quarter, so every quarter it adds is a smaller step than the
+ones Solstice already commits to. No quarter breaches a 15% guard.</p>
+<p>Staking is open to storage providers on the same terms as anyone
+else: the posted rate is uniform across participants, and an SP that
+holds idle FIL can stake it for finality without touching sectors,
+pledge, or block production. Block producers additionally earn the
+includer share for submitting certificates on chain.</p>
+<h2 id="faq">6. FAQ</h2>
+<p><strong>How much comes out of the reserve, and why spend it at
+all?</strong> Between 48M and 91M FIL, in one transfer at the upgrade
+epoch, against a capped envelope. The reserve holds 282.93M FIL, so that
+is 17% to 32% of it. The preferred option is the 91M end, where the
+reserve pays for everything: it is FIL set aside at genesis for new
+miner types, no FIP has ever drawn on it, and spending it asks nothing
+of anyone already being paid. It costs about twice the draw and more
+than three times the first-decade issuance of the cheapest option.
+FIP-0118’s Design Rationale Q3 sets the reserve aside as finite and
+non-renewable, which is an argument for drawing on it carefully rather
+than never: one transfer, under a written ceiling, released on a fixed
+schedule, and a sunset that burns whatever is never paid. The options
+that open a stream draw less and pay for it out of someone’s share.</p>
+<p><strong>If the pool pays stakers every year, how can total FIL
+entering circulation fall every year?</strong> Because what the pool
+pays is small next to what the consensus stream gives up over the same
+period, and block reward itself is declining on the existing minting
+schedule. In year 1 storage-provider consensus reward is 15.212M FIL and
+payments to stakers are 2.300M. By year 6, when payments peak at 4.890M,
+consensus reward has fallen to 3.336M. FIL entering circulation falls in
+every year of the thirty, at both required-return cases and under every
+funding option, including the reserve-only one at 91M FIL. The figures
+here are the worked scenario’s, where the early falls are the large
+ones: 3.65M FIL from year 1 to year 2 and 3.54M from year 2 to year 3 at
+a 5% required return. Even the flattest year still falls, by 0.059M FIL
+at 5% and 0.125M at 3%, and there is no rising year. Year 4 runs 0.165M
+FIL <em>below</em> today’s committed curve.</p>
+<p><strong>What happens if a huge amount of stake signs up at once? Is
+there a cap, and does early signup activate finality sooner?</strong>
+There is a cap, and it binds whatever arrives: in any year the pool can
+pay out at most a fixed fraction of what it currently holds, 22% in the
+worked scenario, which is <strong>6.60M FIL in year 1</strong> on the
+30M FIL released at launch. A rush cannot overshoot the pool, because
+the payment is a rate on the pool and a larger stake lowers the rate
+one-for-one. At a 5% required return, stake above 77M FIL posts under 5%
+at the launch pool, so the next FIL in stops arriving, and stake above
+110M FIL posts under 4%, so stake starts leaving. The modeled peak is
+100M FIL. Early signup does bring activation forward, because the
+mechanism FIP’s activation gate reads stake depth and distribution
+rather than a calendar; at the modeled 5M FIL per month it takes sixteen
+months of uninterrupted inflow to reach 80M FIL.</p>
+<p><strong>When does the consensus reward reach its floor?</strong>
+Under the preferred option the storage-provider share stops at
+Solstice’s published 50% floor and the continuation never starts. Where
+a stream is opened, the floor lands six quarters after the end of
+Solstice’s published ramp at 35%, which on the modeled dates is
+2030-09-01, three and a half years after finality launch. A 30% floor
+takes eight quarters and a 25% floor ten. The 50% waypoint is 2029-03-01
+under every option, and all of these dates move with activation.</p>
+<p><strong>Doesn’t the falling-issuance claim depend on how circulating
+supply is defined?</strong> Yes. The netting amendment is the accounting
+change the analysis recommends: FIL sitting in the pool is not counted
+as circulating until it is paid out. Under it the design runs +10.9M to
++38.8M FIL above today’s committed curve over the first decade depending
+on the option, +12.61M in the worked scenario. Without the amendment,
+the whole transfer lands as a single step in the year it happens, and
+both the decade and the thirty-year figure become the size of that
+transfer. Issuance still falls every year in that world, because the
+step lands in year 1. What breaks without the amendment is the
+comparison against today’s committed curve; the shape of the curve is
+the same either way. Staked FIL is a separate question and the answer
+there is no: staked FIL keeps counting as circulating, as it does on
+every other chain, because <code>FilCirculating</code> is a consensus
+input that sets the per-sector pledge lock target.</p>
+<p><strong>Why would the service cap move at all, when FIP-0118 says
+50%?</strong> Only if the stream is opened. It is paid last: service is
+computed as if the stream were absent and is never reduced by it, so
+service receives the same FIL over thirty years with the stream as
+without it. The stream lives on the residue, and the size of that
+residue is what decides whether the reward can recruit stake at all. At
+the published 50% cap the residue never grows enough and stake never
+reaches the 80M FIL security level at a 5% required return, which is why
+the preferred option leaves the cap alone and the reserve pays for
+everything. Where the cap lands if it does move, 35% or 40%, sets how
+much of the bill the stream carries and therefore how much smaller the
+reserve draw can be.</p>
+<p><strong>What if participation is weaker than modeled?</strong> Each
+row below changes one assumption in the worked scenario and holds
+everything else, including the size of the transfer. The count is
+contiguous years at or above 80M FIL. The options in section 2 respond
+to a higher service cap by drawing more from the reserve instead, which
+is what keeps every one of them at twelve years or more.</p>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stress</th>
+<th>Contiguous years</th>
+<th>Entry year</th>
+<th>Peak stake</th>
+<th>Issuance still falls every year</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Central case</td>
+<td>13</td>
+<td>2</td>
+<td>100M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Service entitlement 30%</td>
+<td>11</td>
+<td>3</td>
+<td>90M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Service entitlement 35%</td>
+<td>9</td>
+<td>4</td>
+<td>85M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Service entitlement 50%</td>
+<td>0</td>
+<td>—</td>
+<td>75M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Required return 5.5%</td>
+<td>10</td>
+<td>4</td>
+<td>90M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Required return 6%</td>
+<td>7</td>
+<td>6</td>
+<td>80M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Gas burn 1M / 3M / 6M FIL per year</td>
+<td>13 / 13 / 13</td>
+<td>2</td>
+<td>100M</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Finality launch slips to 2028-04-01</td>
+<td>12</td>
+<td>2</td>
+<td>100M</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>Gas burn does not matter at all, because the release table is a fixed
+vector and nothing in the funding path reads chain state. A slipped
+launch costs one year. At a fixed transfer the service cap decides
+everything: at 50% the pool never reaches the security level, which is
+why the preferred option is sized around a larger transfer, the 91M FIL
+envelope.</p>
+<h2 id="formula-appendix">7. Formula appendix</h2>
+<p><strong>The posted rate.</strong></p>
+<pre><code>r(S, P) = spend_rate × P / (S + S_offset)</code></pre>
+<p>with the worked scenario’s <code>spend_rate = 0.22</code> per year
+and <code>S_offset = 55M FIL</code> <em>[strawman]</em>. <code>S</code>
+is total staked FIL and <code>P</code> is the released, spendable
+balance of the reward pool. Each year the pool offers a fixed fraction
+of what it currently holds, divided across the FIL staked plus a
+constant that keeps the rate finite when almost nothing is staked. More
+stake lowers the rate; paying rewards lowers the pool and lowers the
+rate again. At launch, with 30M FIL released and nothing staked, this
+reads 0.22 × 30 / 55 = 12.00% exactly, so the opening rate sits on its
+ceiling with no headroom.</p>
+<p>The two constants move together and they move with the funding
+envelope, so each option in section 2 carries its own pair, chosen with
+the envelope. Two things hold in all of them: the opening rate sits at
+or just under a 12% ceiling, and the posted rate stays in a 4–5% band
+while stake is at or above the security level. The worked scenario’s
+pair puts the opening rate exactly on the ceiling; the adopted pair
+leaves headroom below it, so publication rounding cannot breach it.</p>
+<p><strong>The stream weight.</strong></p>
+<pre><code>service share  = min(cap, service entitlement)       # computed as if the stream were absent
+finality share = 1 − storage-provider share − service share</code></pre>
+<p>with a flat 0.45 record for the finality stream <em>[strawman]</em>,
+which the residue never reaches at any cap and floor in the option set.
+Storage providers are paid their scheduled share first, service is paid
+its entitlement up to the cap and is never cut to make room, and the
+finality stream takes what remains. Because the remainder tops out at
+40%, the stream’s own record never binds and no block reward goes
+unallocated.</p>
+<p><strong>The release rule.</strong></p>
+<pre><code>release(y) = scheduled simple minting in year y−1 − scheduled simple minting in year y</code></pre>
+<p>with 30M FIL released to the pool at launch in the worked scenario
+and the table summing to 18.4391M FIL as tabulated (18.43919M exact)
+over years 1–30 <em>[needs precise spec: the final table for the adopted
+envelope, the epoch within each year at which the release lands, and the
+fixed-point representation]</em>. Each year the pool receives the amount
+by which the existing minting schedule shrinks that year. Those amounts
+are known in advance and depend on nothing that happens on chain, so the
+schedule ships as a constant vector in the actor and no gas-burn or
+network-growth path can change it. The rule is that the adopted table
+releases the whole transfer across the thirty years, which is worth
+about one more year at or above the security level than a table that
+strands part of it. The worked scenario’s table is drawn before that
+rule and leaves 1.350M unreleased; whatever is left in the pool at the
+year-30 sunset burns.</p>
+<p>A release-on-need variant, which releases each year only what the
+pool is short of its launch level, was evaluated and set aside. It
+returns one more year at or above the security level at the central 5%
+case and defers about 5M FIL of first-decade issuance, but the extra
+year exists only if the market clears at 5% or below: above that the
+pool never rises far enough above its launch level to hold the 80M FIL
+security level at all. The full comparison is in the funding model’s
+release-on-need runs (unpublished, available on request).</p>
+<h2 id="public-records-referenced">Public records referenced</h2>
+<p>FIP-0118 (Solstice), Design Rationale Q3, “Why not the f090 mining
+reserve?”; FIPs discussions <a
+href="https://github.com/filecoin-project/FIPs/discussions/1249">#1249</a>,
+<a
+href="https://github.com/filecoin-project/FIPs/discussions/887">#887</a>,
+and <a
+href="https://github.com/filecoin-project/FIPs/discussions/1030">#1030</a>.</p>
+</main>
+<footer>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>. Author: Hannah Howard (@hannahhoward).</footer>
+</body>
+</html>

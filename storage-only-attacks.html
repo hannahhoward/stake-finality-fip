@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analysis of storage-only attacks under Expected Consensus, QAP
+Fast Finality, and Stake Finality</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="nav"><a href="index.html">Stake-Weighted F3 Finality</a><span class="sep">·</span><a href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Discussion on the FIPs repo</a></div>
+<main>
+
+<h1
+id="analysis-of-storage-only-attacks-under-expected-consensus-qap-fast-finality-and-stake-finality">Analysis
+of storage-only attacks under Expected Consensus, QAP Fast Finality, and
+Stake Finality</h1>
+<p><em>Supporting analysis for the draft FIP <a
+href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+F3 Finality</a>.</em></p>
+<p>With storage power alone (no staked FIL), an attacker faces different
+odds under the three regimes this document prices: Expected Consensus as
+the network runs today, F3 fast finality weighted by quality-adjusted
+power (QAP), and F3 weighted by staked FIL. The most damaging attack, a
+reorg that reverses hours of settled history and reaches exchange
+deposits, costs 20% of QAP today and 33% once F3 is weighted by QAP, and
+storage power alone cannot run it at all once F3 is weighted by stake.
+Two cheaper attacks survive in every regime: reorgs of one to a few
+epochs at 20% of QAP, which reach integrations that settle within a few
+epochs (Filecoin Pay among them) but no exchange; and full forward
+control, meaning censoring transactions, setting throughput, or taking
+all block rewards, at 51% of QAP. The price of each share falls over the
+program window, in cash and in the number of owners who must collude,
+and in FIL too unless QAP settles above about 2.8 EiB.</p>
+<p><strong>Scope.</strong> Attacks that use storage power alone, under
+three regimes: Expected Consensus with no finality gadget (the network
+today), F3 live and weighted by QAP (FIP-0086 as designed), and F3 live
+and weighted by staked FIL (the draft FIP). Attacks that need stake are
+out of scope. 20% and 51% are shares of QAP; the 33% under QAP-weighted
+F3 is a third of the committee, which is the same third of QAP. Prices
+assume the attacker acquires existing miners, which transfer with their
+sectors and pledge at no fee or delay; building the same power new costs
+tens to hundreds of millions of dollars. Chain figures are as of
+2026-08-23 (Filecoin Data Portal).</p>
+<h2 id="the-attacks">1. The attacks</h2>
+<p>Share of QAP needed, by the cheapest route:</p>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attack</th>
+<th>EC, no gadget</th>
+<th>F3 on QAP</th>
+<th>F3 on stake</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reorg of one to six epochs</td>
+<td>20%</td>
+<td>20%</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>Reorg of up to 900 epochs (7.5 hours)</td>
+<td>20%</td>
+<td>33%</td>
+<td>n/a</td>
+</tr>
+<tr>
+<td>Forward control: censor, set throughput, take all block rewards</td>
+<td>20%</td>
+<td>33%</td>
+<td>51%</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two of the three attacks are available in every regime; only the deep
+reorg is closed, and only by stake weighting. The short reorg costs 20%
+of QAP throughout. Forward control is always available to a large enough
+majority, at 20% under Expected Consensus, 33% once the committee can be
+stalled, and 51% once it cannot, because block production stays weighted
+by storage power in every regime and whoever wins that weight race sets
+what the chain does next.</p>
+<p>The two F3 columns differ because of one mechanism, the stall. Under
+QAP weighting a third of storage power is a third of the committee, and
+a third of the committee can stop signing at no penalty. Certificates
+stop, the network is back on the 900-epoch rule it runs today, and the
+same power then runs the 20% attack, which reaches both the 7.5-hour
+reorg and forward control. Under stake weighting the committee is a
+different set, no amount of storage power can stall it, and forward
+control has to be won on weight at 51%.</p>
+<p><em>The 900-epoch window.</em> Without a certificate, EC rejects
+forks older than 900 epochs and nothing shallower is final. Wang, Azouvi
+and Vukolić (AFT 2023) show that an adversary near 20% of power,
+equivocating in every epoch an honest block is mined and winning every
+weight tie, splits honest miners across forks and replaces them with a
+private chain of its own blocks. That reverses anything settled inside
+7.5 hours. Under QAP-weighted F3 an attacker above a third who can also
+keep honest committee members’ views split can sign two certificates for
+one instance; FIP-0086 has no slashing for it.</p>
+<p><em>The short reorg.</em> With a live committee, lotus proposes four
+epochs behind the head and the certificate lands about six behind it. In
+our simulation of go-f3’s consensus code against an EC model with
+lotus’s weight function, a 20% adversary running the equivocation attack
+never reorged deeper than 6 epochs under lotus’s fork choice (11 in a
+stress variant that gives it every weight tie) and never replaced a
+certified tipset over 3,000-epoch runs. A simpler weight-race model
+prices the attempt, which is a private fork from the current head, costs
+only gas, and can be repeated every epoch: at 20%, a one-epoch reorg
+lands 6.6% of the time, three epochs 1.6%, six epochs 0.005% with a
+gadget live and 0.21% without.</p>
+<p><em>Forward control.</em> 51% wins the weight race outright in every
+regime, with no equivocation; under a live committee it must win inside
+each six-epoch window, so a comfortable majority is needed. The cheaper
+routes in the table are the equivocation attack with no gadget, where at
+20% the canonical chain is attacker-only for as long as the split holds,
+and the stall under QAP weighting, which puts the network back in that
+regime at 33%. Under a live committee of either weighting the 20% attack
+is partial: 6% to 16% of certified tipsets carry attacker blocks only,
+and the certified chain stays 78% to 84% honest.</p>
+<p>The protocol penalty is the same in every cell: a consensus-fault
+slash of 4 FIL, on provable double-fork mining only. Spread over many
+identities it is 10⁻⁵ of collateral per thousand epochs (Wang et
+al. §6.2).</p>
+<h2 id="what-the-shares-cost-over-the-next-twelve-years">2. What the
+shares cost over the next twelve years</h2>
+<ul>
+<li><strong>Pledge</strong> is the collateral standing on the acquired
+power. It is returned at sector expiry, or at 91.5% or more on voluntary
+termination. It is capital tied up rather than spent.</li>
+<li><strong>Cash at risk</strong> is what the attacker consumes: the
+8.5% termination fee, plus about 1.2% for 90 days of financing at 5%,
+together 9.7% of the pledge figure. A miner bought below its pledge and
+left to expire returns more FIL than it cost, so at a distressed price
+the cash figure is negative.</li>
+<li><strong>Owners</strong> is how many distinct owners must sell or
+collude to reach the share, computed from the block-reward shares the
+public L1-health dashboard publishes; the power distribution may
+differ.</li>
+</ul>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Millions of FIL unless stated</th>
+<th>20% of QAP</th>
+<th>33% of QAP</th>
+<th>51% of QAP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pledge, today</td>
+<td>13.1</td>
+<td>21.5</td>
+<td>33.3</td>
+</tr>
+<tr>
+<td>Pledge, 2028</td>
+<td>14.2</td>
+<td>23.4</td>
+<td>36.2</td>
+</tr>
+<tr>
+<td>Pledge, 2032 (trough)</td>
+<td>6.4</td>
+<td>10.6</td>
+<td>16.4</td>
+</tr>
+<tr>
+<td>Pledge, 2039, if QAP settles at 4.1 EiB</td>
+<td>17.7</td>
+<td>29.2</td>
+<td>45.1</td>
+</tr>
+<tr>
+<td>Pledge, 2039, if QAP keeps falling</td>
+<td>2.4 to 7.9</td>
+<td>3.9 to 13.1</td>
+<td>6.0 to 20.2</td>
+</tr>
+<tr>
+<td>Cash at risk, today (FIL at $0.77)</td>
+<td>1.3 ($1.0M)</td>
+<td>2.1 ($1.6M)</td>
+<td>3.2 ($2.5M)</td>
+</tr>
+<tr>
+<td>Cash at risk, 2032</td>
+<td>0.6</td>
+<td>1.0</td>
+<td>1.6</td>
+</tr>
+<tr>
+<td>Owners, today</td>
+<td>4</td>
+<td>10</td>
+<td>18 to 42</td>
+</tr>
+<tr>
+<td>Owners, 2028, on the dashboard’s 24-month trend</td>
+<td>2</td>
+<td>4</td>
+<td>11</td>
+</tr>
+</tbody>
+</table></div>
+<p>The pledge line falls now because the pledge book priced before
+FIP-0081 is expiring. After 2032 it recovers only if QAP settles above
+about 2.8 EiB: above that level the FIP-0081 formula sets total network
+pledge near 9% of circulating supply whatever QAP is; below it the cap
+of 32 FIL per QAP-TiB binds and pledge tracks power down. The 4.1 EiB
+path is the output of our model of storage-provider economics under the
+funding analysis’s worked scenario, held flat after 2032. Nothing yet
+shows QAP settling there: the last 30 days of decline annualise to −62%
+a year, and solving our supply and reward models together takes QAP
+below 2.8 EiB between 2029 and 2032, which is the last pledge row. The
+two cases separate soon: the 4.1 EiB path needs total network pledge to
+reverse and rise about 7%, to roughly 70M FIL, by the first quarter of
+2027, and it is 65.3M and falling.</p>
+<p>Cash and owner count fall on every path modelled. The protocol has no
+floor under the owner count: <code>ConsensusMinerMinMiners</code> counts
+miner actors, and one owner can hold any number of them.</p>
+<h2 id="what-settles-inside-three-epochs">3. What settles inside three
+epochs</h2>
+<p>Anything that treats a transaction as final at depth 0 to 3 is
+reachable by the short reorg at 20%, several times an hour. Depths below
+are read from source or published configuration on 2026-08-24; exchange
+depths are from the venues’ public APIs.</p>
+<div class="tbl"><table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Depth</th>
+<th>Integration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Filecoin Pay <code>settleRail</code> (settles to the head); USDFC
+liquidation and redemption (no confirmation wait); Pyth pull updates;
+lotus <code>StateWaitMsg</code> when the message has already executed
+(returns at depth 1 whatever confidence was requested)</td>
+</tr>
+<tr>
+<td>1</td>
+<td>lotus <code>latest</code>; Hyperlane’s Filecoin route
+(<code>confirmations: 1</code>, <code>reorgPeriod: 0</code>);
+synapse-sdk synchronous calls (viem default); Curio’s FEVM watcher
+(<code>MinEthConfidence = 1</code>), which piri’s PDP piece-add
+inherits</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Axelar deployment tooling</td>
+</tr>
+<tr>
+<td>5 to 10</td>
+<td>Curio’s Filecoin-message watcher and lotus
+<code>MessageConfidence</code> (5); Boost sector-committed (6) and
+<code>PublishStorageDeals</code> (10)</td>
+</tr>
+<tr>
+<td>60 and up</td>
+<td>Coinbase, Binance, Bitget, HTX, Bithumb (60); KuCoin, Coinone (120);
+Kraken (300, 2020 listing); withdrawals at 900</td>
+</tr>
+</tbody>
+</table></div>
+<p>Filecoin Pay settles rails at the head, so a payee that acts on a
+settlement in the same epoch is inside the window an attacker holding
+four owners’ miners can reach. No exchange credits inside the window.
+Under either live committee, 20% of storage power gets the short reorgs
+against the top rows of this table; the 7.5-hour window that reaches
+exchanges opens with 33% under QAP weighting and does not open with
+storage alone under stake weighting.</p>
+<p><strong>Sources.</strong> Wang, Azouvi, Vukolić, <em>Security
+Analysis of Filecoin’s Expected Consensus in the Byzantine vs Honest
+Model</em>, AFT 2023; FIP-0086; lotus and go-f3 source (fork choice,
+weight, <code>HeadLookback</code>); builtin-actors and go-state-types
+(pledge, termination, slash); Filecoin Data Portal and the L1-health
+dashboard (pledge, QAP, owner shares); venue APIs and integration
+configs for §3. The simulation and the pricing model are Filecoin
+Foundation work, unpublished, available on request.</p>
+</main>
+<footer>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>. Author: Hannah Howard (@hannahhoward).</footer>
+</body>
+</html>

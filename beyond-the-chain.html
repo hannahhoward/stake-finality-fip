@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beyond the chain: operationalizing stake-weighted
+finality</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="nav"><a href="index.html">Stake-Weighted F3 Finality</a><span class="sep">·</span><a href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Discussion on the FIPs repo</a></div>
+<main>
+
+<h1
+id="beyond-the-chain-operationalizing-stake-weighted-finality">Beyond
+the chain: operationalizing stake-weighted finality</h1>
+<p><em><a
+href="https://github.com/filecoin-project/FIPs/discussions/XXXX">Stake-Weighted
+F3 Finality</a></em> lays out the changes required to the chain actors
+and node clients: the power table for F3, the fast-finality protocol
+Filecoin’s committee runs, is derived from staked FIL instead of
+quality-adjusted storage power. This document describes the additional
+off-chain tasks that will make stake-weighted finality a successful
+program. They all serve one goal, the activation threshold: about 80M
+FIL staked and dispersed, the level at which certificates become
+authoritative.</p>
+<h2 id="what-the-protocol-ships">What the protocol ships</h2>
+<p>On chain, the FIP ships a staking actor recording a staked balance
+and a registered BLS signing key per participant. The actor supports
+deposit, withdrawal behind an unbonding delay and delegation, and holds
+the activation state the finality switch reads. Power-table construction
+changes in one input. A reward is paid per included signature and
+carried on chain by a block producer who submits each certificate as an
+ordinary message for a smaller includer share. Equivocation slashing
+scales with how much stake equivocates in the same window.</p>
+<p>The FIP names the parties this work falls to: delegated staking
+operators, custodians, exchanges, wallets and dashboards.</p>
+<p>Filecoin settles on Expected Consensus today. Recruitment speed sets
+when fast finality starts. Certificates stay advisory until the
+threshold is met, the state the network already lives in, so safety
+holds at today’s level.</p>
+<h2 id="the-participation-api">The participation API</h2>
+<p>Certificate signers are a bitset over the instance’s power table, so
+reading “who signed” means reconstructing the ordered table for that
+instance. Per-participant inclusion accounting, and an operator-level
+view of it in the CLI, are new work in go-f3 v0.8.14, lotus and forest
+as of 2026-08-05.</p>
+<p>The participation API is the feed that turns a signer bitset into
+“this participant signed.” Payment checking reads it, since the reward
+grows only when a signature lands in a canonical certificate,
+denominated in the epochs that certificate newly finalizes. So do pool
+operators, whose revenue is per included signature, and concentration
+monitoring, since the dispersion constants are re-checked against who
+controls signing weight rather than against address counts, which are
+cheap to manufacture.</p>
+<p>It is also how a staker diagnoses earning nothing: a participant
+holding less than 1/65535 of total stake (roughly 1,526 FIL at a
+100M-FIL pool) scales to zero power, still listed in the power table as
+a positive-power entry and silently unable to sign.</p>
+<p>The feed is new work in every client, built in two languages and held
+identical by shared conformance vectors.</p>
+<h2 id="delegated-staking-operators">Delegated staking operators</h2>
+<p>A depositor buys one product: FIL in, a share of the participation
+reward out, without running a node or holding a signing key. The FIP
+calls this expected and healthy, since the operator performs the real
+signing work. The certificate condition disallows collecting on idle
+balances. The operator’s obligations, as the FIP states them:</p>
+<p><strong>BLS key registration and rotation.</strong> Rotation must be
+delayed so a certificate signed under an old key stays attributable, on
+the model of the miner actor’s rotation delay; without it an operator
+could repudiate a signature. Today a single non-BLS entry aborts
+power-table construction in both lotus and forest, so admitting a
+non-BLS address is a one-registration denial of fast finality for
+everyone.</p>
+<p><strong>Running a participant whose revenue is per included
+signature.</strong> Signing alone earns nothing; the gate is inclusion
+in a canonical certificate, which makes inclusion monitoring the
+operator’s revenue reporting, depositor accounting and uptime alerting
+at once. In lotus the signing key must sit hot in the node daemon’s
+wallet, and remote signing is marked in the code as future work.</p>
+<p><strong>Reward accounting and a share back to depositors.</strong>
+Claims are pull-based, so the posted rate is gross of the includer share
+and of the gas the staker pays to claim, and any net rate an operator
+quotes to a depositor is the operator’s own arithmetic on top of the
+posted one.</p>
+<p><strong>A stated slashing exposure.</strong> Isolated equivocation
+draws a small base slash (working figure: 1–5%) plus committee ejection,
+and the slash scales with the total stake equivocating in the same
+window, reaching a total burn as that fraction approaches the third
+needed to threaten finality. Because the scale grows as further proofs
+arrive, slashes sit in escrow until the window closes and execute at the
+final scale. A mass event, which looks like a network partition or a
+defective release, is the other reason to wait.</p>
+<p><strong>Which stake burns.</strong> Under delegation the signing key
+is the operator’s and the slashed capital is largely the depositors’.
+Which burns (the operator’s bond, the depositors’ pro-rata share, or
+both in some order) follows from the committee identity model. The FIP
+records it as unsettled, and more open items depend on it than on any
+other.</p>
+<p><strong>Unbonding terms.</strong> Withdrawal sits behind a delay set
+by two conditions: it must strictly exceed the fault-proof submission
+window so an equivocator cannot withdraw ahead of the slash, and it must
+be long enough that an exit is priced against the posted rate rather
+than traded intraday. Working figure: 90 days.</p>
+<h3 id="what-dispersion-means-for-an-operator-that-grows">What
+dispersion means for an operator that grows</h3>
+<p>Activation requires distribution as well as depth, because a deep
+pool concentrated in a few hands is cheap to tip. The conditions are
+that the smallest coalition of distinct participants controlling a third
+of stake exceed <code>N_min</code> participants, and that no single
+participant hold more than <code>max_share</code> of the pool. Both are
+measured over delegated operators, the unit that actually signs, rather
+than over raw addresses, and the concentration analysis sets both
+constants.</p>
+<p>For a successful operator that is a ceiling on the share of the pool
+it can hold while the network still activates. Lido reached roughly 23%
+of all staked ETH through the route this proposal opens (its own
+February-2026 tokenholder update). The conditions are necessary but not
+sufficient, since on-chain identities are cheap to multiply: they force
+a deliberate attacker to at least manufacture apparent distribution.
+Pool depth and correlation-scaled slashing are the economic backstop.
+Reversing activation after a concentration finding takes a FIP and a
+network upgrade.</p>
+<h2 id="custodians-and-exchanges">Custodians and exchanges</h2>
+<p>Staked FIL leaves the holder’s account balance and lives in actor
+state, which changes what a custodian’s ledger has to carry.</p>
+<p><strong>A staked-and-accruing balance concept.</strong> The balance
+lives in actor state and grows only when a signature lands in a
+canonical certificate. Ledgers, statements and reconciliation have to
+carry a balance that is committed and accruing.</p>
+<p><strong>Pull-based claims.</strong> Rewards arrive only when someone
+claims them. Someone runs the claim and pays the gas, and the ledger has
+to account for both, against a posted rate that is gross of them.</p>
+<p><strong>The unbonding delay in withdrawal terms.</strong> A custodian
+offering FIL staking is offering an instrument a customer exits on the
+unbonding delay. That is a disclosure question.</p>
+<p>The dispersion rules constrain participants, and nothing in them
+constrains jurisdictions. Delegated stake will tend to sit with
+exchanges and custodians, regulated companies a government can lean on.
+Jurisdictional concentration is a separate measure from the dispersion
+rules. The damage is bounded by the payoff: compelled custodians can at
+worst stall finality back to today’s network.</p>
+<h2 id="wallets">Wallets</h2>
+<p>A staker needs deposit, key registration, withdrawal and claim
+against the staking actor’s methods. All four are new wallet work, and a
+first-class staking client starts as a new repository. Lotus binds
+enrollment to a miner address today, so verbs that start and stop
+participation for a plain FIL holder are part of the same work. Key
+registration carries invariants the wallet has to enforce at deposit and
+registration time: BLS only, subgroup validation, a duplicate-key rule,
+the rotation delay.</p>
+<h2 id="finality-consumers">Finality consumers</h2>
+<p>Exchanges, bridges, verifying contracts and snapshots carrying F3
+state all track the certificate chain. The certificate format, its
+verification and the two-thirds quorum rule are unchanged, and the chain
+restarts: the committee begins a fresh instance chain under a new
+network name, with instance numbering starting over. That retires the
+old instance chain cleanly, so verifiers built against it reject
+stake-era certificates instead of mistaking them for authoritative.</p>
+<p><strong>Re-initialization.</strong> New bootstrap epoch, new initial
+power table, new network name, which changes the peer-to-peer topics and
+the datastore prefix and invalidates every published F3 snapshot, so
+snapshot producers are affected too.</p>
+<p><strong>Reading the authority mark.</strong> Certificates carry no
+authority bit today. An external verifier needs a way to tell a binding
+certificate from an advisory one, including the trivially-quorate first
+stake-era certificates, since the existing smart-contract verification
+pattern will accept an advisory certificate as final. The FIP answers
+with an append-only activation record in the staking actor: a
+certificate is binding exactly when the record shows an entry opened at
+or before its instance and not closed by it. A node reads the record
+directly. A verifier holding only certificates reads the latch state out
+of the committee’s supplemental-data commitment, where a committee
+attests to its own authority. An integrator that takes one-way
+activation at its word can instead pin a single epoch, the way an
+upgrade height is published. The commitment’s encoding is open.</p>
+<p>Certificates read as binding (certificate head final within tens of
+seconds), advisory, or halted. Advisory and halted report finality on
+the 900-epoch rule at about 7.5 hours, and only binding and advisory pay
+signers. The floor under all three is today’s network, so the fallback
+an integrator engineers for is the one it runs on now.</p>
+<p><strong>One jump in reported finality at activation.</strong> A node
+reports as finalized the later of the Expected-Consensus finality and
+the latest certificate head. With advisory certificates suppressed
+beforehand, that tag jumps forward by up to about 900 epochs in one step
+when certificates bind, and the derived safe tag moves with it, so
+anything computing confirmations off those tags sees the discontinuity
+once. What an integrator gets in return is settlement in tens of seconds
+against today’s 7.5 hours. On the modeled scenarios certificates bind
+from years 2–4 and the pool holds the security level for 12–14 years.
+The schedule sunsets at year 30.</p>
+<h2 id="dashboards-and-supply-reporting">Dashboards and supply
+reporting</h2>
+<p><strong>Circulating-supply classification is mandatory, in both lotus
+and forest, in the same release.</strong> The state-traversal
+circulating-supply RPC hard-errors on any unclassified actor, so the
+reward pool and the staking actor must both be added to the
+classification or the call fails outright. The pool’s whole unpaid
+balance is netted out of circulating supply, reported as a single
+balance.</p>
+<p><strong>Staked FIL stays inside circulating supply, and dashboards
+carry a liquid-float line.</strong> On the protocol ledger the locked
+figure for recent network versions is the power actor’s total locked
+only. Extending it to staked FIL would be another consensus-critical
+change, and it would push pledge down as stake accumulates. The funding
+analysis leaves staked FIL inside circulating supply for that reason and
+reports the staking lock as a liquid-float line, circulating supply
+minus staked FIL. Circulating supply itself differs by source, since the
+protocol figure nets out pledge: 903.13M FIL against 819.16M at the
+aggregators at the same snapshot (epoch 6,275,948, 2026-08-13).</p>
+<p><strong>Concentration monitoring is a standing off-chain
+task.</strong> The activation conditions call for an analysis of
+realized ownership and delegation. That analysis sets the dispersion
+constants and runs entirely off chain. The dispersion requirement is new
+for the committee: its Nakamoto coefficient at the one-third threshold
+reads 7, down from 84 in January 2023, with the top ten owners holding
+38.5% of block rewards (Filecoin Data Portal series behind the public
+L1-health dashboard, 2026-07-13). Whether the staking actor keeps
+publishing distribution statistics after activation, as a monitored
+signal with no automatic consequence, is open, and the FIP argues it
+should.</p>
+<h2 id="the-recruitment-campaign">The recruitment campaign</h2>
+<p>The threshold is crossed by persuading holders of tens of millions of
+FIL to stake. That work happens entirely off chain, and the FIP calls it
+arguably the larger endeavor.</p>
+<p><strong>The target.</strong> About 80M FIL staked and dispersed. At
+the modeled arrival rate of 5M FIL a month, that takes sixteen months of
+uninterrupted inflow. The scenarios assume 130M FIL of reachable idle
+capital, 14.6% of the aggregators’ circulating supply, bracketed from
+two ends: the low end is the roughly 32M FIL parked in GLIF, the
+revealed on-chain preference for yield (3.6% of circulating), the high
+end what a cross-chain staked share of 30–60% of circulating supply
+would imply, 267M to 534M FIL. Both the 130M and the 5M a month are
+modeling assumptions, placed between the two readings by judgment. The
+FIP calls uptake its largest open variable. Its first test is whether
+staked FIL reaches 80M within two years of the upgrade epoch. That is
+where the model puts it, and depth far short of that falsifies the case.
+Thin demand is also expensive: at 40M FIL of reachable capital the pool
+never activates, every certificate paid for over thirty years is
+advisory, and the bill is 97% of what full demand costs.</p>
+<p><strong>Who holds idle FIL.</strong> The measured base is holders
+already accepting yield on chain: roughly 40M FIL, about 5% of
+circulating supply, as of 2026-07-05 (45M including one failed
+protocol’s stranded funds; CoinGecko circulating 795M at that date).
+GLIF dominates it at about 32M FIL across 3,590 iFIL holders (total
+value locked, 2026-07-05). FIL-denominated deposits held flat through an
+85% drawdown in dollar terms (1.8M FIL July 2023, 34M July 2024, a 35.6M
+peak July 2025, 31.9M at the 2026-07-05 reading), but the base plateaued
+in 2024 and is bleeding about 10% a year, GLIF itself is diversifying
+into non-Filecoin tokens, and the stFIL failure burned a cohort that
+never re-parked. About 10% is where on-chain FIL products bearing credit
+risk have attracted supply.</p>
+<p>Recently exited storage providers are a second population, and their
+holding decays with time since exit: of 15 sampled top-50 miners that
+exited in 2025, 67% still held at least 1,000 FIL in provider-controlled
+actors, against 27% for 2024 exiters, 7% for 2022H2–2023 and
+approximately zero for the 2021 cohort (n=15 per cohort for the
+2022H2–2025 windows, top-50 miners only, sampled 2026-07-05; the 2021
+reading is a separate 99-miner top-100 sample). Roughly 2.2M FIL sits in
+or near provider control across 30 recent exiters, counting every
+untraced withdrawal as sold.</p>
+<p>Attributing FIL balances to exchanges, custodians, ETFs and corporate
+treasuries is research the campaign needs. The largest single holding is
+155M FIL, about 19% of the aggregators’ circulating supply, untagged and
+created November 2020, with its address history still to be traced.</p>
+<p><strong>The posted rate falls as stake arrives.</strong> It is a
+published function of pool depth and released balance, opening under a
+12% ceiling (working figure) and settling at 4.0–5.0% while staked FIL
+holds the security level. At launch, on the FIP’s worked configuration:
+12.00% at zero staked, 8.25% at 25M, 6.29% at 50M, 4.89% at 80M, 4.26%
+at 100M, 3.57% at 130M staked FIL. Early stake is paid the most, so the
+first 80M FIL is recruited at a declining price. Whether the includer
+share comes out of that rate or sits on top of it is open.</p>
+<p><strong>Sequencing against deployment.</strong> Staking opens at the
+network upgrade, when the staking actor, the submission path and
+slashing activate; no committee runs and finality behavior is unchanged.
+Staking is open but unpaid through that stage, since the reward starts
+with the first signature inside a certificate. The committee forms at a
+coordinated client release triggered by registered stake passing a
+formation floor set far below the activation threshold, after which
+certificates are produced, submitted on chain and paid for, with
+slashing live; signers earn through that stage even though certificates
+are advisory, because payment turns on signatures rather than on
+bindingness. Activation is data-triggered with no release of its own.
+Neither later stage carries a date, so recruitment plans key off the
+stake figure.</p>
+<p><strong>The year-3 review.</strong> It fires at year three if the
+activation conditions have never been met, and annually after, reporting
+what the pool did over the trailing year and carrying the amendment
+path. It keys on activation rather than on the pool balance, because the
+case it catches is a pool that recruits stake, pays for advisory
+certificates, and never reaches the level at which any of them binds. A
+schedule that has bracketed the market’s required return wrongly is
+amended there.</p>
+<h2 id="decisions-that-product-terms-wait-on">Decisions that product
+terms wait on</h2>
+<p>The FIP records these as open, and settling each one releases work
+somebody has to ship.</p>
+<ul>
+<li><strong>The committee identity model</strong>: worker key, dedicated
+key, or delegated operator key. It decides whose stake burns when a
+delegated operator equivocates, and whether the power table carries one
+entry per operator with pooled stake or one per depositor. Settling it
+is what lets an operator write a slashing disclosure and a custodian
+write product terms. It is a specification decision that lands before
+implementation.</li>
+<li><strong>Whether the includer share is inside or on top of the posted
+rate.</strong> It decides what a staker is quoted against what the pool
+pays, and so what a net rate quoted to a depositor means.</li>
+<li><strong>The unbonding delay.</strong> Working figure: 90 days. It is
+the withdrawal term every custodial and pool product discloses.</li>
+<li><strong>The per-certificate gas cost.</strong> Verification runs in
+the actor using arithmetic that already ships there, so no new syscall
+is needed. Computing that cost at mainnet parameters tells implementers
+whether verification stays in the actor. If it comes back prohibitive
+the named fallback moves verification client-side, with the actor
+consuming a system-attested summary, which changes the
+architecture.</li>
+<li><strong>The includer economics.</strong> The share is on the order
+of 10%, paid to whoever submits the certificate on chain, in practice
+the block producer, since only the producer collecting it has a reason
+to include a submission. How the share is sized against the base-fee
+rule, what message container carries a submission, and how consecutive
+submissions batch are all open. The 64 KiB message cap bounds the
+container and the batching.</li>
+</ul>
+<p>Block-producer software has to submit certificates, and
+storage-provider F3 participation software stops being eligible and
+needs a deprecation note as participation moves to stake.</p>
+<hr />
+<p>Further reading: <a
+href="https://github.com/filecoin-project/FIPs/discussions/XXXX">the FIP
+discussion</a>, <a
+href="https://hannahhoward.github.io/stake-finality-fip/funding-options-and-recommendation.html">funding
+the finality reward: options and a recommendation</a>, <a
+href="https://hannahhoward.github.io/stake-finality-fip/funding-explainer.html">how
+the finality reward is paid for</a>, <a
+href="https://hannahhoward.github.io/stake-finality-fip/storage-only-attacks.html">storage-only
+attacks</a>, <a
+href="https://hannahhoward.github.io/stake-finality-fip/two-class-stake.html">two
+classes of stake</a>, <a
+href="https://hannahhoward.github.io/stake-finality-fip">all supporting
+documents</a>.</p>
+</main>
+<footer>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>. Author: Hannah Howard (@hannahhoward).</footer>
+</body>
+</html>
